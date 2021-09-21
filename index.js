@@ -1,6 +1,7 @@
 const amqp = require('amqplib')
 const express = require('express')
 // const bodyParser = require('body-parser')
+const port = process.env.PORT || 3000
 
 const generateId = () => Math.random().toString(16).slice(2)
 
@@ -89,4 +90,7 @@ const consumer = async () => {
 }
 
 producer(app)
-  .then(() => app.listen(3000, consumer))
+  .then(() => {
+    console.log(`listening for requests on :${port}`)
+    app.listen(port, consumer)
+  })
