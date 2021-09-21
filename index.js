@@ -11,7 +11,7 @@ const app = express()
 const mapping = new Map()
 
 app.get('/mapping', (req, res) => {
-  res.json(Object.keys(mapping))
+  res.json(Array.from(mapping.keys()))
 })
 
 const producer = async (app) => {
