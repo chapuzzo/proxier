@@ -10,6 +10,17 @@ const app = express()
 
 const mapping = new Map()
 
+const enqueueResult = (id, handler, data) => {
+  mapping.set(id, {
+    handler,
+    data
+  })
+}
+
+const dequeueResult = (id) => {
+  mapping.delete(id)
+}
+
 app.get('/mapping', (req, res) => {
   res.json(Array.from(mapping.keys()))
 })
@@ -20,17 +31,6 @@ const producer = async (app) => {
   const channel = await connection.createChannel()
   await channel.assertQueue('responses')
   await channel.assertQueue('requests')
-
-  const enqueueResult = (id, handler, data) => {
-    mapping.set(id, {
-      handler,
-      data
-    })
-  }
-
-  const dequeueResult = (id) => {
-    mapping.delete(id)
-  }
 
   channel.consume('responses', async message => {
     const {content, properties: {correlationId: id}} = message
@@ -46,6 +46,7 @@ const producer = async (app) => {
       ...data,
       ...result
     })
+
     channel.ack(message)
     dequeueResult(id)
   })
